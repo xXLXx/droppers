@@ -1,7 +1,7 @@
 import React from 'react';
 import List from '@mui/material/List';
 
-function Bracket() {
+const BracketPage: React.FC = ()  => {
 
   return (
     <>
@@ -11,4 +11,4 @@ function Bracket() {
   );
 }
 
-export default Bracket;
+export default BracketPage;

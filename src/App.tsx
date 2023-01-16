@@ -1,37 +1,38 @@
-import React from 'react';
-import BottomNavigation from '@mui/material/BottomNavigation';
-import BottomNavigationAction from '@mui/material/BottomNavigationAction';
-import AccountCircle from '@mui/icons-material/AccountCircle';
-import SportsTennis from '@mui/icons-material/SportsTennis';
-import Paper from '@mui/material/Paper';
-import Box from '@mui/material/Box';
-import Bracket from './Bracket';
-import Profiles from './Profiles';
-import './App.css';
+import React, { lazy, Suspense, useState } from 'react'
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
+import Loader from 'components/Loader'
+import Layout from 'Layout'
+import './App.css'
+
+const BracketPage = lazy(() => import('pages/BracketPage'))
+const ProfilesPage = lazy(() => import('pages/ProfilesPage'))
+const queryClient = new QueryClient({
+  defaultOptions: {
+    queries: {
+      retryDelay: 1000,
+    },
+  },
+})
 
 function App() {
-  const [value, setValue] = React.useState('bracket');
-
   return (
     <div className="App">
-      <Box sx={{ pb: 7 }} >
-        { value === 'profiles' ? <Profiles /> : null }
-        { value === 'bracket' ? <Bracket /> : null }
-        <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0 }} elevation={3}>
-          <BottomNavigation
-            showLabels
-            value={value}
-            onChange={(event, newValue) => {
-              setValue(newValue);
-            }}
-          >
-            <BottomNavigationAction value="profiles" label="Profiles" icon={<AccountCircle />} />
-            <BottomNavigationAction value="bracket" label="Bracket" icon={<SportsTennis />} />
-          </BottomNavigation>
-        </Paper>
-      </Box>
+      <QueryClientProvider client={queryClient}>
+        <Router>
+          <Suspense fallback={<Loader />}>
+            <Routes>
+              <Route path="/" element={<Layout />}>
+                <Route index path="profiles" element={<ProfilesPage />} />
+                <Route path="bracket" element={<BracketPage />} />
+                <Route path="/" element={<Navigate to="/profiles" />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </Router>
+      </QueryClientProvider>
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
